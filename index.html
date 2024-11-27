@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>검미 사진첩</title>
+    <style>
+        /* 전체 스타일 */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
+            color: #333;
+        }
+
+        header {
+            background: #ff5f6d;
+            background: linear-gradient(to right, #ff5f6d, #ffc371);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .upload-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .drag-drop {
+            border: 3px dashed #ff5f6d;
+            border-radius: 15px;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            color: #ff5f6d;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .drag-drop:hover {
+            background: rgba(255, 95, 109, 0.1);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            margin: 0 auto;
+            width: 90%;
+        }
+
+        .photo {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .photo img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+
+        .photo:hover img {
+            transform: scale(1.1);
+        }
+
+        .filter-buttons {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .filter-buttons button {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s ease;
+        }
+
+        .filter-buttons button:hover {
+            background: linear-gradient(to right, #0072ff, #00c6ff);
+        }
+
+        footer {
+            background: linear-gradient(to right, #ff5f6d, #ffc371);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                font-size: 1.5rem;
+            }
+
+            .drag-drop {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        검미 사진첩
+    </header>
+
+    <div class="upload-container">
+        <div id="drag-drop-area" class="drag-drop">사진을 여기에 드래그하거나 클릭하세요</div>
+        <input type="file" id="file-upload" accept="image/*" multiple style="display:none;">
+    </div>
+
+    <div class="filter-buttons" id="filter-buttons">
+        <button data-filter="none">원본</button>
+        <button data-filter="grayscale(100%)">흑백</button>
+        <button data-filter="sepia(100%)">세피아</button>
+        <button data-filter="brightness(1.5)">밝기 강조</button>
+        <button data-filter="contrast(2)">대비 강조</button>
+    </div>
+
+    <section class="gallery" id="gallery"></section>
+
+    <footer>
+        © 2024 검미 사진첩 - 10대를 위한 멋진 사진첩
+    </footer>
+
+    <script>
+        const dragDropArea = document.getElementById('drag-drop-area');
+        const fileInput = document.getElementById('file-upload');
+        const gallery = document.getElementById('gallery');
+        const filterButtons = document.getElementById('filter-buttons');
+
+        dragDropArea.addEventListener('click', () => fileInput.click());
+
+        dragDropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dragDropArea.style.backgroundColor = '#ffc1c7';
+        });
+
+        dragDropArea.addEventListener('dragleave', () => {
+            dragDropArea.style.backgroundColor = 'transparent';
+        });
+
+        dragDropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dragDropArea.style.backgroundColor = 'transparent';
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const photoDiv = document.createElement('div');
+                    photoDiv.classList.add('photo');
+                    photoDiv.innerHTML = `<img src="${e.target.result}" alt="사진">`;
+                    gallery.appendChild(photoDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        filterButtons.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const filter = e.target.dataset.filter;
+                const images = gallery.querySelectorAll('img');
+                images.forEach(img => {
+                    img.style.filter = filter;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
